@@ -74,7 +74,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'my2hand.wsgi.application'
+WSGI_APPLICATION = 'my2hand.wsgi.app'
 
 
 # Database
