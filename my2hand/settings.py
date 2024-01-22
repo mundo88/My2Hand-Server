@@ -53,7 +53,7 @@ MIDDLEWARE = [
 ]
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',  # for localhost (REACT Default)
-    'https://my2-hand-client.vercel.app',  # for localhost (REACT Default)
+    'https://my2-hand-client.vercel.app',  # for vercel deploy 
     'http://127.0.0.1:3000',  # for localhost (REACT Default)
     'http://192.168.223.1:3000', # for network
     'http://172.17.160.1:3000', # for network
