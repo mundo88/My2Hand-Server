@@ -24,8 +24,7 @@ SECRET_KEY = 'django-insecure-y_@07znt-h_%5$wq9-n=xmq(*l8$@)8)hs15qxt36am1ye=1ma
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
 
 
 # Application definition
@@ -57,7 +56,6 @@ CORS_ORIGIN_WHITELIST = (
     'http://192.168.223.1:3000', # for network
     'http://172.17.160.1:3000', # for network
 )
-ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
 ROOT_URLCONF = 'my2hand.urls'
 
 TEMPLATES = [
