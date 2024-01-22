@@ -37,7 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders'
+    'corsheaders',
+    'api',
+    'home'
 ]
 
 MIDDLEWARE = [
@@ -55,6 +57,7 @@ CORS_ORIGIN_WHITELIST = (
     'http://192.168.223.1:3000', # for network
     'http://172.17.160.1:3000', # for network
 )
+ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
 ROOT_URLCONF = 'my2hand.urls'
 
 TEMPLATES = [
