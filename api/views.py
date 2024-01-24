@@ -1,6 +1,6 @@
 from django.http import JsonResponse
-import random,json
-
+import json
+from pytube import Playlist
 
 def story(request):
     context = [{
@@ -122,7 +122,6 @@ def posts(request):
     posts = json.load(f)
     return JsonResponse(posts)
 
-
 def categories(request):
     f = open('api/data/categories.json',encoding='utf-8')
     categories = json.load(f)
@@ -150,3 +149,18 @@ def user(request,user_id=1):
     users = json.load(f)['users']
     user = [x for x in users if x.get('id') == user_id]
     return JsonResponse(user[0])
+
+def youtubePlaylist(request):
+    # p = Playlist('https://www.youtube.com/watch?v=11XkLOIsLHI&list=PLn7c8RY7CfPbs_XTnBFv7Z72f8J9ghWY-').videos
+    # data = []
+    # for video in p:
+    #     streams = video.streams
+    #     itag = streams.get_by_itag(137)
+    #     if itag is not None:
+    #         data.append({'url':itag.url}) 
+    # youtube = {
+    #     'youtube':data
+    # }
+    f = open('api/data/youtube.json',encoding='utf-8')
+    youtube = json.load(f)
+    return JsonResponse(youtube)

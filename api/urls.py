@@ -11,5 +11,6 @@ urlpatterns = [
     path("products/<int:product_id>", views.product, name="product"),
     path("users", views.users, name="users"),
     path("users/<int:user_id>", views.user, name="user"),
+    path("youtube/playlist", views.youtubePlaylist, name="youtube_playlist"),
 
 ]
