@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 import json
 from pytube import Playlist
+import timeago, datetime
 
 def story(request):
     context = [{
@@ -150,23 +151,39 @@ def user(request,user_id=1):
     user = [x for x in users if x.get('id') == user_id]
     return JsonResponse(user[0])
 
+
+def video(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        video_id = data.get('video_id','')
+        f = open('api/data/youtube.json',encoding='utf-8')
+        youtube = json.load(f)['youtube']
+        video = [x for x in youtube if x.get('id') == video_id]
+        return JsonResponse(video[0])
+        
 def youtubePlaylist(request):
     if request.method == 'POST':
-        p = Playlist('https://www.youtube.com/watch?v=11XkLOIsLHI&list=PLn7c8RY7CfPbs_XTnBFv7Z72f8J9ghWY-').videos
+        p = Playlist('https://www.youtube.com/watch?v=Rr5bP7uLnfk&list=PLxNMBnO9F8FM_636MAQJmIkjHF2DNgmsa').videos
         data = []
         for video in p:
-            streams = video.streams
-            print(streams)
-            itag = streams.get_by_itag(22)
-            if itag is not None:
-                data.append({'url':itag.url}) 
+            data.append(
+                {
+                    'id':video.video_id,
+                    'url':video.watch_url,
+                    'author':video.author,
+                    'views':video.views,
+                    'publish_date':timeago.format(video.publish_date, datetime.datetime.now(),'vi'),
+                    'title':video.title,
+                    'thumbnail':video.thumbnail_url,
+                    'description':video.description,
+                }
+            )
         youtube = {
             'youtube':data
         }
-        print(youtube)
         with open("api/data/youtube.json", "w") as outfile:
             json.dump(youtube, outfile)
-        return JsonResponse(youtube)
+        return JsonResponse({'youtube':youtube})
     f = open('api/data/youtube.json',encoding='utf-8')
     youtube = json.load(f)
     return JsonResponse(youtube)
