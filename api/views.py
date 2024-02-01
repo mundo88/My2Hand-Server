@@ -186,18 +186,18 @@ def video(request):
         snippet =video['snippet']
         statistics = video['statistics']
         return JsonResponse({
-                "id":video['id'],
-                "url":"https://www.youtube.com/watch?v="+video['id'],
-                "title":snippet['title'],
-                "publish_date":timeago.format(datetime.datetime.strptime(snippet['publishedAt'],'%Y-%m-%dT%H:%M:%SZ'), datetime.datetime.now(),'vi'),
-                "thumbnail":snippet['thumbnails']['medium']['url'],
-                "description":snippet['description'],
-                "views":statistics['viewCount'],
-                "author":channel(channel_id=snippet['channelId']),
-                "likeCount":statistics['likeCount'],
-                "commentCount":statistics['commentCount'],
-                "comments":comments(video_id)
-            })
+            "id":video['id'],
+            "url":"https://www.youtube.com/watch?v="+video['id'],
+            "title":snippet['title'],
+            "publish_date":timeago.format(datetime.datetime.strptime(snippet['publishedAt'],'%Y-%m-%dT%H:%M:%SZ'), datetime.datetime.now(),'vi'),
+            "thumbnail":snippet['thumbnails']['medium']['url'],
+            "description":snippet['description'],
+            "views":statistics['viewCount'],
+            "author":channel(channel_id=snippet['channelId']),
+            "likeCount":statistics['likeCount'],
+            "commentCount":statistics['commentCount'],
+            "comments":comments(video_id)
+        })
 def channel(channel_id):
     data = requests.get(f'https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id={channel_id}&key=AIzaSyBazHyDOIg4AeDVrkysKUyKGbua_8SVSlA').json()['items'][0]
     snippet = data['snippet']
@@ -212,7 +212,6 @@ def comments(video_id):
     items = requests.get(f'https://www.googleapis.com/youtube/v3/commentThreads?key=AIzaSyBazHyDOIg4AeDVrkysKUyKGbua_8SVSlA&textFormat=plainText&part=snippet&videoId={video_id}&maxResults=50').json()['items']
     data = []
     for item in items:
-        print(item)
         snippet = item['snippet']['topLevelComment']['snippet']
         data.append({
             "authorDisplayName":snippet['authorDisplayName'],
