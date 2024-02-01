@@ -4,3 +4,6 @@ django-cors-headers
 pytube
 sqlparse
 tzdata
+dotenv
+timeago
+requests

@@ -1,7 +1,12 @@
 from django.http import JsonResponse
 import json
 from pytube import Playlist
-import timeago, datetime
+import timeago, datetime,time
+from dotenv import load_dotenv;load_dotenv()
+import os,requests
+
+
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
 def story(request):
     context = [{
@@ -141,9 +146,9 @@ def product(request,product_id=12):
     products = json.load(f)['products']
     product = [x for x in products if x.get('id') == product_id]
     return JsonResponse(product[0])
-def users(request):
-    f = open('api/data/users.json',encoding='utf-8')
-    users = json.load(f)
+def users(request) -> JsonResponse:
+    f = open(file='api/data/users.json',encoding='utf-8')
+    users = json.load(fp=f)
     return JsonResponse(users)
 def user(request,user_id=1):
     f = open('api/data/users.json',encoding='utf-8')
@@ -152,38 +157,74 @@ def user(request,user_id=1):
     return JsonResponse(user[0])
 
 
+
+
+def videos(request):
+    if request.method == 'GET':
+        videos = requests.get(f'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,player,statistics&chart=mostPopular&regionCode=VN&maxResults=20&key=AIzaSyBazHyDOIg4AeDVrkysKUyKGbua_8SVSlA').json()
+        items = videos['items']
+        data = []
+        for item in items:
+            snippet =item['snippet']
+            statistics = item['statistics']
+            data.append({
+                "id":item['id'],
+                "title":snippet['title'],
+                "publish_date":timeago.format(datetime.datetime.strptime(snippet['publishedAt'],'%Y-%m-%dT%H:%M:%SZ'), datetime.datetime.now(),'vi'),
+                "thumbnail":snippet['thumbnails']['medium']['url'],
+                "description":snippet['description'],
+                "views":statistics['viewCount'],
+                "author":channel(channel_id=snippet['channelId']),
+            })
+        return JsonResponse({'data':data})
 def video(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         video_id = data.get('video_id','')
-        f = open('api/data/youtube.json',encoding='utf-8')
-        youtube = json.load(f)['youtube']
-        video = [x for x in youtube if x.get('id') == video_id]
-        return JsonResponse(video[0])
+        videos = requests.get(f'https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails,player,statistics&key=AIzaSyBazHyDOIg4AeDVrkysKUyKGbua_8SVSlA&id={video_id}').json()
+        video = videos['items'][0]
+        snippet =video['snippet']
+        statistics = video['statistics']
+        return JsonResponse({
+                "id":video['id'],
+                "url":"https://www.youtube.com/watch?v="+video['id'],
+                "title":snippet['title'],
+                "publish_date":timeago.format(datetime.datetime.strptime(snippet['publishedAt'],'%Y-%m-%dT%H:%M:%SZ'), datetime.datetime.now(),'vi'),
+                "thumbnail":snippet['thumbnails']['medium']['url'],
+                "description":snippet['description'],
+                "views":statistics['viewCount'],
+                "author":channel(channel_id=snippet['channelId']),
+                "likeCount":statistics['likeCount'],
+                "commentCount":statistics['commentCount'],
+                "comments":comments(video_id)
+            })
+def channel(channel_id):
+    data = requests.get(f'https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id={channel_id}&key=AIzaSyBazHyDOIg4AeDVrkysKUyKGbua_8SVSlA').json()['items'][0]
+    snippet = data['snippet']
+    statistics = data['statistics']
+    return {
+        "name":snippet['title'],
+        "photo_picture":snippet['thumbnails']['default']['url'],
+        "custom_url":snippet['customUrl'],
+        "followCount":statistics['subscriberCount']
+    }      
+def comments(video_id):
+    items = requests.get(f'https://www.googleapis.com/youtube/v3/commentThreads?key=AIzaSyBazHyDOIg4AeDVrkysKUyKGbua_8SVSlA&textFormat=plainText&part=snippet&videoId={video_id}&maxResults=50').json()['items']
+    data = []
+    for item in items:
+        print(item)
+        snippet = item['snippet']['topLevelComment']['snippet']
+        data.append({
+            "authorDisplayName":snippet['authorDisplayName'],
+            "textDisplay":snippet['textDisplay'],
+            "authorProfileImageUrl":snippet['authorProfileImageUrl'],
+            "authorChannelUrl":snippet['authorChannelUrl'],
+            "likeCount":snippet['likeCount'],
+            "publishedAt":snippet['publishedAt'],
+            "totalReplyCount":item['snippet']['totalReplyCount']
+        })   
+    return data
+
         
-def youtubePlaylist(request):
-    if request.method == 'POST':
-        p = Playlist('https://www.youtube.com/watch?v=Rr5bP7uLnfk&list=PLxNMBnO9F8FM_636MAQJmIkjHF2DNgmsa').videos
-        data = []
-        for video in p:
-            data.append(
-                {
-                    'id':video.video_id,
-                    'url':video.watch_url,
-                    'author':video.author,
-                    'views':video.views,
-                    'publish_date':timeago.format(video.publish_date, datetime.datetime.now(),'vi'),
-                    'title':video.title,
-                    'thumbnail':video.thumbnail_url,
-                    'description':video.description,
-                }
-            )
-        youtube = {
-            'youtube':data
-        }
-        with open("api/data/youtube.json", "w") as outfile:
-            json.dump(youtube, outfile)
-        return JsonResponse({'youtube':youtube})
-    f = open('api/data/youtube.json',encoding='utf-8')
-    youtube = json.load(f)
-    return JsonResponse(youtube)
+
+
