@@ -175,6 +175,9 @@ def videos(request):
                 "description":snippet['description'],
                 "views":statistics['viewCount'],
                 "author":channel(channel_id=snippet['channelId']),
+                "viewCount":statistics['viewCount'],
+                "likeCount":statistics['likeCount'],
+                "commentCount":statistics['commentCount'],
             })
         return JsonResponse({'data':data})
 def video(request):
