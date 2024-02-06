@@ -13,4 +13,5 @@ urlpatterns = [
     path("users/<int:user_id>", views.user, name="user"),
     path("videos", views.videos, name="videos"),
     path("video", views.video, name="video"),
+    path("images", views.images, name="images"),
 ]

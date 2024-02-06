@@ -173,13 +173,15 @@ def videos(request):
                 "publish_date":timeago.format(datetime.datetime.strptime(snippet['publishedAt'],'%Y-%m-%dT%H:%M:%SZ'), datetime.datetime.now(),'vi'),
                 "thumbnail":snippet['thumbnails']['medium']['url'],
                 "description":snippet['description'],
-                "views":statistics['viewCount'],
+                "views":statistics.get('viewCount'),
                 "author":channel(channel_id=snippet['channelId']),
-                "viewCount":statistics['viewCount'],
-                "likeCount":statistics['likeCount'],
-                "commentCount":statistics['commentCount'],
+                "viewCount":statistics.get('viewCount'),
+                "likeCount":statistics.get('likeCount'),
+                "commentCount":statistics.get('commentCount'),
             })
         return JsonResponse({'data':data})
+
+        
 def video(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -195,10 +197,10 @@ def video(request):
             "publish_date":timeago.format(datetime.datetime.strptime(snippet['publishedAt'],'%Y-%m-%dT%H:%M:%SZ'), datetime.datetime.now(),'vi'),
             "thumbnail":snippet['thumbnails']['medium']['url'],
             "description":snippet['description'],
-            "views":statistics['viewCount'],
+            "views":statistics.get('viewCount'),
             "author":channel(channel_id=snippet['channelId']),
-            "likeCount":statistics['likeCount'],
-            "commentCount":statistics['commentCount'],
+            "likeCount":statistics.get('likeCount'),
+            "commentCount":statistics.get('commentCount'),
             "comments":comments(video_id)
         })
 def channel(channel_id):
@@ -230,3 +232,5 @@ def comments(video_id):
         
 
 
+def images(request):
+    return JsonResponse(requests.get('https://api.unsplash.com/photos?per_page=24&client_id=dxHkNHGCm06jszV8sIgkCJYjcd7jV5IVtnQreDnUVac').json(),safe=False)
